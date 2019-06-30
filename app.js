@@ -1,10 +1,31 @@
-const koa = require("koa");
-const app = new koa();
+const Koa = require("koa");
+const app = new Koa();
 
-// add first middleware
-app.use(ctx => {
-  console.log(ctx);
-  ctx.body = "Hello World";
+const KoaBody = require("koa-body");
+const router = require("./router/index");
+
+// add Body Parser
+app.use(KoaBody());
+// apply routes
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+// add middleware
+app.use((ctx, next) => {
+  console.log(
+    "=========== middleware REQ Headers ===========\n",
+    ctx.req.headers
+  );
+  next();
+});
+
+// Error handler
+app.on("error", err => {
+  console.error(
+    "\n=========== KOA server error ===========\n",
+    err,
+    "\n========================================"
+  );
 });
 
 // spinup server
